@@ -12,7 +12,3 @@ app.include_router(item_cardapio_router.router)
 @app.get("/")
 def root():
     return {"message": "API is running"}
-
-print("ROTAS REGISTRADAS:")
-for r in app.routes:
-    print(r.path)
