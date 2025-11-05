@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services import cliente_service
 
-router  = APIRouter(prefix="/clientes", tags=["Clientes"])
+router = APIRouter(prefix="/clientes", tags=["Clientes"])
 
 @router.get("/")
 def listar_clientes(db: Session = Depends(get_db)):
