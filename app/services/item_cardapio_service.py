@@ -1,20 +1,17 @@
 from sqlalchemy.orm import Session
 from app.models.item_cardapio import ItemCardapio, PratoEntrada, PratoPrincipal, Sobremesa
+from app.enums import TipoItemCardapio
 
 class CardapioService:
     def __init__(self, db: Session):
         self.db = db
 
     def criar_item(self, nome: str, preco_base: float, tipo: str) -> ItemCardapio:
-        tipo_map = {
-            "entrada": PratoEntrada,
-            "principal": PratoPrincipal,
-            "sobremesa": Sobremesa
-        }
 
-        cls = tipo_map.get(tipo.lower())
-        if not cls:
-            raise ValueError("Tipo inválido: entrada, principal ou sobremesa.")
+        try:
+            cls = TipoItemCardapio(tipo.lower())
+        except ValueError:
+            raise ValueError("Tipo de item inválido.")
 
         item = cls(nome=nome, preco_base=preco_base, tipo=tipo.lower())
         self.db.add(item)

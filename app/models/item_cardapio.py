@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String, Float, Enum
+from app.database import Base
+from app.enums import TipoItemCardapio
 
 class ItemCardapio(Base):
     __tablename__ = "itens_cardapio"
@@ -9,7 +8,7 @@ class ItemCardapio(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False)
     preco_base = Column(Float, nullable=False)
-    tipo = Column(String, nullable=False)
+    tipo = Column(Enum(TipoItemCardapio), nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "item",
