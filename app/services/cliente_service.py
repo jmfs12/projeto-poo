@@ -2,34 +2,38 @@ from sqlalchemy.orm import Session
 from app.models.cliente import Cliente
 from fastapi import HTTPException
 
-def listar_clientes(db: Session):
-    return db.query(Cliente).all()
+class ClienteService:
+    def __init__(self, db: Session):
+        self.db = db
 
-def buscar_cliente(db: Session, cliente_id: int):
-    cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
-    if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
-    return cliente
+    def listar(self):
+        return self.db.query(Cliente).all()
 
-def criar_cliente (db: Session, nome: str, email: str, vip: bool = False):
-    novo_cliente = Cliente(name=nome, email=email, vip=vip)
-    db.add(novo_cliente)
-    db.commit()
-    db.refresh(novo_cliente)
-    return novo_cliente
+    def buscar(self, cliente_id: int):
+        cliente = self.db.query(Cliente).filter(Cliente.id == cliente_id).first()
+        if not cliente:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        return cliente
 
-def atualizar_cliente(db: Session, cliente_id: int, name: str | None = None, vip: bool | None = None):
-    cliente = buscar_cliente(db, cliente_id)
-    if name is not None:
-        cliente.name = name
-    if vip is not None:
-        cliente.vip = vip
-    db.commit()
-    db.refresh(cliente)
-    return cliente
+    def criar(self, nome: str, email: str, vip: bool = False):
+        novo_cliente = Cliente(name=nome, email=email, vip=vip)
+        self.db.add(novo_cliente)
+        self.db.commit()
+        self.db.refresh(novo_cliente)
+        return novo_cliente
 
-def deletar_cliente(db: Session, cliente_id: int):
-    cliente = buscar_cliente(db, cliente_id)
-    db.delete(cliente)
-    db.commit()
-    return {"mensagem": "Cliente removido"}
+    def atualizar(self, cliente_id: int, name: str | None = None, vip: bool | None = None):
+        cliente = self.buscar(cliente_id)
+        if name is not None:
+            cliente.name = name
+        if vip is not None:
+            cliente.vip = vip
+        self.db.commit()
+        self.db.refresh(cliente)
+        return cliente
+
+    def deletar(self, cliente_id: int):
+        cliente = self.buscar(cliente_id)
+        self.db.delete(cliente)
+        self.db.commit()
+        return {"mensagem": "Cliente removido"}

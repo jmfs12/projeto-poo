@@ -1,26 +1,29 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.services import cliente_service
+from app.services.cliente_service import ClienteService
 
 router = APIRouter(prefix="/clientes", tags=["Clientes"])
 
+def get_cliente_service(db: Session = Depends(get_db)):
+    return ClienteService(db)
+
 @router.get("/")
-def listar_clientes(db: Session = Depends(get_db)):
-    return cliente_service.listar_clientes(db)
+def listar_clientes(service: ClienteService = Depends(get_cliente_service)):
+    return service.listar()
 
 @router.get("/{cliente_id}")
-def buscar_cliente(cliente_id: int, db: Session = Depends(get_db)):
-    return cliente_service.buscar_cliente(db, cliente_id)
+def buscar_cliente(cliente_id: int, service: ClienteService = Depends(get_cliente_service)):
+    return service.buscar(cliente_id)
 
 @router.post("/")
-def criar_cliente(name: str, email: str, vip: bool = False, db: Session = Depends(get_db)):
-    return cliente_service.criar_cliente(db, name, email, vip)
+def criar_cliente(name: str, email: str, vip: bool = False, service: ClienteService = Depends(get_cliente_service)):
+    return service.criar(name, email, vip)
 
 @router.put("/{cliente_id}")
-def atualizar_cliente(cliente_id: int, name: str | None = None, vip: bool | None = None, db: Session = Depends(get_db)):
-    return cliente_service.atualizar_cliente(db, cliente_id, name, vip)
+def atualizar_cliente(cliente_id: int, name: str | None = None, vip: bool | None = None, service: ClienteService = Depends(get_cliente_service)):
+    return service.atualizar(cliente_id, name, vip)
 
 @router.delete("/{cliente_id}")
-def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
-    return cliente_service.deletar_cliente(db, cliente_id)
+def deletar_cliente(cliente_id: int, service: ClienteService = Depends(get_cliente_service)):
+    return service.deletar(cliente_id)
